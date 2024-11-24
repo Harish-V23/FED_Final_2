@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Image Slider 2</title>
+    <style>
+      body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        background-color: #eceff1;
+      }
+      .slider-container {
+        width: 500px;
+        position: relative;
+      }
+      .slider-container img {
+        width: 100%;
+        display: none;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      }
+      .slider-container img.visible {
+        display: block;
+      }
+      .nav {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        display: flex;
+        justify-content: space-between;
+        width: 100%;
+      }
+      .nav button {
+        background: rgba(0, 0, 0, 0.5);
+        color: white;
+        border: none;
+        padding: 10px;
+        cursor: pointer;
+      }
+      .nav button:hover {
+        background: rgba(0, 0, 0, 0.7);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="slider-container">
+      <img src="1.jpg" class="visible" alt="Slide 1" />
+      <img src="2.jpg" alt="Slide 2" />
+      <img src="3.jpg" alt="Slide 3" />
+      <div class="nav">
+        <button id="prev">❮</button>
+        <button id="next">❯</button>
+      </div>
+    </div>
+    <script>
+      const slides = document.querySelectorAll(".slider-container img");
+      let currentIndex = 0;
+
+      function showSlide(index) {
+        slides.forEach((slide, i) => {
+          slide.classList.toggle("visible", i === index);
+        });
+      }
+
+      document.getElementById("next").addEventListener("click", () => {
+        currentIndex = (currentIndex + 1) % slides.length;
+        showSlide(currentIndex);
+      });
+
+      document.getElementById("prev").addEventListener("click", () => {
+        currentIndex = (currentIndex - 1 + slides.length) % slides.length;
+        showSlide(currentIndex);
+      });
+
+      setInterval(() => {
+        currentIndex = (currentIndex + 1) % slides.length;
+        showSlide(currentIndex);
+      }, 5000);
+    </script>
+  </body>
+</html>

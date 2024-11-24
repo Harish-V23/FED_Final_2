@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Interactive Calendar 2</title>
+  <style>
+    body {
+      font-family: 'Verdana', sans-serif;
+      background: linear-gradient(to right, #74ebd5, #9face6);
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .calendar {
+      width: 320px;
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+      overflow: hidden;
+    }
+    .calendar-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #4a90e2;
+      color: white;
+      padding: 10px 20px;
+    }
+    .calendar-header button {
+      background: none;
+      border: 2px solid white;
+      border-radius: 5px;
+      color: white;
+      cursor: pointer;
+      padding: 5px 10px;
+    }
+    .calendar-header button:hover {
+      background: white;
+      color: #4a90e2;
+    }
+    .day-names {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      background: #f5f5f5;
+      color: #333;
+      text-align: center;
+      font-weight: bold;
+      padding: 10px 0;
+    }
+    .days {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      padding: 10px;
+    }
+    .days div {
+      text-align: center;
+      padding: 10px;
+      margin: 5px;
+      cursor: pointer;
+      border-radius: 5px;
+      transition: transform 0.2s, background 0.3s;
+    }
+    .days div:hover {
+      background: #4a90e2;
+      color: white;
+      transform: scale(1.1);
+    }
+    .days div.selected {
+      background: #4a90e2;
+      color: white;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="calendar">
+    <div class="calendar-header">
+      <button id="prev">← Prev</button>
+      <span id="current-month"></span>
+      <button id="next">Next →</button>
+    </div>
+    <div class="day-names">
+      <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
+    </div>
+    <div class="days"></div>
+  </div>
+
+  <script>
+    const daysContainer = document.querySelector('.days');
+    const currentMonthEl = document.getElementById('current-month');
+    const prevBtn = document.getElementById('prev');
+    const nextBtn = document.getElementById('next');
+
+    const today = new Date();
+    let currentMonth = today.getMonth();
+    let currentYear = today.getFullYear();
+
+    function getDaysInMonth(year, month) {
+      return new Date(year, month + 1, 0).getDate();
+    }
+
+    function renderCalendar() {
+      daysContainer.innerHTML = '';
+      const daysInMonth = getDaysInMonth(currentYear, currentMonth);
+      const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+
+      currentMonthEl.textContent = new Date(currentYear, currentMonth).toLocaleString('default', {
+        month: 'long',
+        year: 'numeric'
+      });
+
+      for (let i = 0; i < firstDay; i++) {
+        daysContainer.innerHTML += `<div></div>`;
+      }
+
+      for (let day = 1; day <= daysInMonth; day++) {
+        const dayDiv = document.createElement('div');
+        dayDiv.textContent = day;
+        dayDiv.addEventListener('click', () => {
+          const selected = daysContainer.querySelector('.selected');
+          if (selected) {
+            selected.classList.remove('selected');
+          }
+          dayDiv.classList.add('selected');
+        });
+        daysContainer.appendChild(dayDiv);
+      }
+    }
+
+    prevBtn.addEventListener('click', () => {
+      currentMonth--;
+      if (currentMonth < 0) {
+        currentMonth = 11;
+        currentYear--;
+      }
+      renderCalendar();
+    });
+
+    nextBtn.addEventListener('click', () => {
+      currentMonth++;
+      if (currentMonth > 11) {
+        currentMonth = 0;
+        currentYear++;
+      }
+      renderCalendar();
+    });
+
+    renderCalendar();
+  </script>
+</body>
+</html>

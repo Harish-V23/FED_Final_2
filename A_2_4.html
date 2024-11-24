@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Advanced Multi-Step Form</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #eef2f3;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .form-container {
+      width: 450px;
+      background: white;
+      padding: 20px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      border-radius: 10px;
+    }
+    .progress-bar {
+      display: flex;
+      margin-bottom: 20px;
+    }
+    .progress-bar div {
+      flex: 1;
+      height: 10px;
+      background: #ddd;
+      margin-right: 5px;
+      border-radius: 5px;
+    }
+    .progress-bar div.active {
+      background: #00bcd4;
+    }
+    .step {
+      display: none;
+    }
+    .step.active {
+      display: block;
+    }
+    .buttons {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 20px;
+    }
+    .buttons button {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .buttons button[disabled] {
+      background: #ddd;
+      cursor: not-allowed;
+    }
+    .buttons .prev {
+      background: #f44336;
+      color: white;
+    }
+    .buttons .next {
+      background: #4caf50;
+      color: white;
+    }
+    .error {
+      color: red;
+      font-size: 12px;
+    }
+  </style>
+</head>
+<body>
+  <div class="form-container">
+    <div class="progress-bar" id="progressBar">
+      <div class="active"></div>
+      <div></div>
+      <div></div>
+      <div></div>
+    </div>
+    <form id="multiStepForm">
+      <!-- Step 1 -->
+      <div class="step active" id="step1">
+        <h2>Personal Details</h2>
+        <label for="fullname">Full Name:</label>
+        <input type="text" id="fullname" name="fullname">
+        <div class="error" id="errorFullName"></div>
+        <label for="birthdate">Date of Birth:</label>
+        <input type="date" id="birthdate" name="birthdate">
+        <div class="error" id="errorBirthDate"></div>
+      </div>
+
+      <!-- Step 2 -->
+      <div class="step" id="step2">
+        <h2>Contact Details</h2>
+        <label for="phone">Phone Number:</label>
+        <input type="tel" id="phone" name="phone" placeholder="123-456-7890">
+        <div class="error" id="errorPhone"></div>
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email">
+        <div class="error" id="errorEmail"></div>
+      </div>
+
+      <!-- Step 3 -->
+      <div class="step" id="step3">
+        <h2>Preferences</h2>
+        <label for="contactMode">Preferred Contact Method:</label>
+        <select id="contactMode" name="contactMode">
+          <option value="">Select</option>
+          <option value="phone">Phone</option>
+          <option value="email">Email</option>
+          <option value="both">Both</option>
+        </select>
+        <div class="error" id="errorContactMode"></div>
+        <label>Newsletter Subscription:</label>
+        <input type="radio" id="subscribeYes" name="newsletter" value="yes">
+        <label for="subscribeYes">Yes</label>
+        <input type="radio" id="subscribeNo" name="newsletter" value="no">
+        <label for="subscribeNo">No</label>
+        <div class="error" id="errorNewsletter"></div>
+      </div>
+
+      <!-- Step 4 -->
+      <div class="step" id="step4">
+        <h2>Summary</h2>
+        <p>Review your details and submit.</p>
+        <div id="summary"></div>
+      </div>
+
+      <div class="buttons">
+        <button type="button" class="prev" id="prevBtn" disabled>Previous</button>
+        <button type="button" class="next" id="nextBtn">Next</button>
+      </div>
+    </form>
+  </div>
+
+  <script>
+    const steps = document.querySelectorAll('.step');
+    const progressBar = document.querySelectorAll('.progress-bar div');
+    const nextBtn = document.getElementById('nextBtn');
+    const prevBtn = document.getElementById('prevBtn');
+    const summary = document.getElementById('summary');
+    let currentStep = 0;
+    const formData = {};
+
+    function updateProgressBar() {
+      progressBar.forEach((bar, index) => {
+        bar.classList.toggle('active', index <= currentStep);
+      });
+    }
+
+    function showStep(step) {
+      steps.forEach((stepElement, index) => {
+        stepElement.classList.toggle('active', index === step);
+      });
+      prevBtn.disabled = step === 0;
+      nextBtn.textContent = step === steps.length - 1 ? 'Submit' : 'Next';
+      updateProgressBar();
+    }
+
+    function validateStep(step) {
+      let valid = true;
+      const errors = document.querySelectorAll(`#step${step + 1} .error`);
+      errors.forEach(error => (error.textContent = ''));
+
+      const inputs = steps[step].querySelectorAll('input, select');
+      inputs.forEach(input => {
+        if (input.required && !input.value) {
+          const errorId = `error${input.id.charAt(0).toUpperCase() + input.id.slice(1)}`;
+          document.getElementById(errorId).textContent = `${input.name} is required`;
+          valid = false;
+        }
+      });
+
+      return valid;
+    }
+
+    nextBtn.addEventListener('click', () => {
+      if (validateStep(currentStep)) {
+        const inputs = steps[currentStep].querySelectorAll('input, select');
+        inputs.forEach(input => (formData[input.name] = input.value));
+
+        if (currentStep === steps.length - 1) {
+          summary.innerHTML = `<pre>${JSON.stringify(formData, null, 2)}</pre>`;
+          alert('Form Submitted Successfully!');
+          return;
+        }
+
+        currentStep++;
+        showStep(currentStep);
+      }
+    });
+
+    prevBtn.addEventListener('click', () => {
+      currentStep--;
+      showStep(currentStep);
+    });
+
+    updateProgressBar();
+  </script>
+</body>
+</html>
